@@ -1,0 +1,33 @@
+name: Python CI
+
+on: 
+  push: 
+    branches:  [ main ]
+  pull_request: 
+    branches:  [ main ]
+
+jobs: 
+  test: 
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+
+    steps:
+    - uses:  actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with: 
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+        cache-dependency-path: 'pyproject.toml'
+    
+    - name: Build wheel
+      run: |
+        cd Testing/BasicProject
+        python -m pip install --upgrade pip
+        python -m pip install . --extra-index-url https://wheels.vtk.org --extra-index-url https://vtk.org/files/wheel-sdks
+        python -c "from basic_project import vtkDummy; print(vtkDummy()); exit(0)"
+        

@@ -1,0 +1,14 @@
+NAME
+  Dummy::Dummy
+LIBRARY_NAME
+  vtkDummy
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+DEPENDS
+  VTK::CommonCore
+  VTK::RenderingCore
+PRIVATE_DEPENDS
+  VTK::IOXML
+
