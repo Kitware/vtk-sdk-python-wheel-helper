@@ -1,0 +1,72 @@
+# /bin/bash
+
+###
+# Thin wrapper arround auditwheel for Linux.
+# Usage: patchwheel [auditwheel-options]... <file>
+###
+
+# install missing audit dependencies
+python -m pip install auditwheel patchelf
+# Auditwheel spams output with "INFO: excluding ...", this is what the grep is for
+# This exclusion list should remove all VTK libraries for modules presents in the vtk wheel.
+auditwheel repair \
+  --exclude="libviskores*" \
+  --exclude="libvtkAccelerators*" \
+  --exclude="libvtkcgns*" \
+  --exclude="libvtkCharts*" \
+  --exclude="libvtkCommon*" \
+  --exclude="libvtkDICOM*" \
+  --exclude="libvtkDomains*" \
+  --exclude="libvtkdoubleconversion*" \
+  --exclude="libvtkexodusII*" \
+  --exclude="libvtkexpat*" \
+  --exclude="libvtkFilters*" \
+  --exclude="libvtkfmt*" \
+  --exclude="libvtkfreetype*" \
+  --exclude="libvtkGeovis*" \
+  --exclude="libvtkgl2ps*" \
+  --exclude="libvtkglad*" \
+  --exclude="libvtkh5part*" \
+  --exclude="libvtkhdf5*" \
+  --exclude="libvtkImaging*" \
+  --exclude="libvtkInfovis*" \
+  --exclude="libvtkInteraction*" \
+  --exclude="libvtkIO*" \
+  --exclude="libvtkioss*" \
+  --exclude="libvtkjpeg*" \
+  --exclude="libvtkjsoncpp*" \
+  --exclude="libvtkkissfft*" \
+  --exclude="libvtklibharu*" \
+  --exclude="libvtklibproj*" \
+  --exclude="libvtklibxml2*" \
+  --exclude="libvtkloguru*" \
+  --exclude="libvtklz4*" \
+  --exclude="libvtklzma*" \
+  --exclude="libvtkm*" \
+  --exclude="libvtkmetaio*" \
+  --exclude="libvtknetcdf*" \
+  --exclude="libvtkogg*" \
+  --exclude="libvtkParallel*" \
+  --exclude="libvtkpng*" \
+  --exclude="libvtkpugixml*"  \
+  --exclude="libvtkPythonContext2D*" \
+  --exclude="libvtkRendering*" \
+  --exclude="libvtkscn*" \
+  --exclude="libvtkSerializationManager*" \
+  --exclude="libvtksqlite*" \
+  --exclude="libvtksys*" \
+  --exclude="libvtkTesting*" \
+  --exclude="libvtktheora*" \
+  --exclude="libvtktiff*" \
+  --exclude="libvtktoken*" \
+  --exclude="libvtkUtilities*" \
+  --exclude="libvtkverdict*" \
+  --exclude="libvtkViews*" \
+  --exclude="libvtkvpic*" \
+  --exclude="libvtkWeb*" \
+  --exclude="libvtkWrapping*" \
+  --exclude="libvtkxdmf2*" \
+  --exclude="libvtkzfp*" \
+  --exclude="libvtkzlib*" \
+  $@ \
+  2>&1 | grep -v "INFO:"
