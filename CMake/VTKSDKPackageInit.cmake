@@ -42,34 +42,49 @@ function(vtksdk_generate_package_init package_name)
 
   # Get all dependencies of given modules.
   # LINK_LIBRARIES property contains all DEPENDS and PRIVATE_DEPENDS specified in vtk.module
-  set(module_deps)
+  set(modules_deps)
+  set(modules_name)
   foreach(module IN LISTS arg_MODULES)
+    if(module MATCHES "VTK::")
+      message(FATAL_ERROR "VTK:: namespace is reserved for VTK owns modules. Please use a different namespace."
+        "Note that this is only enforced for the module NAME, not for its LIBRARY_NAME that may start with `vtk`")
+    endif()
+    vtk_module_get_property(${module} PROPERTY INTERFACE_vtk_module_library_name VARIABLE _name)
+    list(APPEND modules_name ${_name})
     vtk_module_get_property(${module} PROPERTY LINK_LIBRARIES VARIABLE _libs)
-    list(APPEND module_deps ${_libs})
+    list(APPEND modules_deps ${_libs})
   endforeach()
-  list(SORT module_deps)
-  list(REMOVE_DUPLICATES module_deps)
+  list(SORT modules_deps)
+  list(REMOVE_DUPLICATES modules_deps)
+  # ignore our own modules in deps list
+  list(REMOVE_ITEM modules_deps ${modules_name})
 
   # Generate header/footer
   set(PACKAGE_INIT "# BEGIN: Generated automatically by VTK-SDK helper\n")
+
   # Generate import/del of vtkmodules
-  foreach(module IN LISTS module_deps)
-    string(REPLACE "VTK::" "vtk" _name "${module}")
+  foreach(module IN LISTS modules_deps)
+    # ignore all non-VTK modules
+    if(NOT module MATCHES "^VTK::")
+      continue()
+    endif()
+    vtk_module_get_property(${module} PROPERTY INTERFACE_vtk_module_library_name VARIABLE _name)
     string(APPEND PACKAGE_INIT "import vtkmodules.${_name}\n")
   endforeach()
+
   # Generate import of given modules
   foreach(module IN LISTS arg_MODULES)
     vtk_module_get_property(${module} PROPERTY INTERFACE_vtk_module_library_name VARIABLE _name)
     string(APPEND PACKAGE_INIT "from .${_name} import *\n")
   endforeach()
-  string(APPEND PACKAGE_INIT "# END: Generated automatically by VTK-SDK helper\n")
+
   # End header
+  string(APPEND PACKAGE_INIT "# END: Generated automatically by VTK-SDK helper\n")
 
   # Generate footer
   set(PACKAGE_UNINIT "# BEGIN: Generated automatically by VTK-SDK helper\n")
   string(APPEND PACKAGE_UNINIT "del vtkmodules\n")
   string(APPEND PACKAGE_UNINIT "# END: Generated automatically by VTK-SDK helper\n")
-  # End footer
 
   # transform arg content into a file as configure_file can only take files
   if(arg_CONTENT)
