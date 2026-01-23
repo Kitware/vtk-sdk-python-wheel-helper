@@ -31,4 +31,4 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install . --extra-index-url https://wheels.vtk.org --extra-index-url https://vtk.org/files/wheel-sdks
         python -c "from basic_project import vtkDummy; print(vtkDummy()); exit(0)"
-        
+        python -c "import basic_project; exit(int(hasattr(basic_project, 'vtkmodules')))"

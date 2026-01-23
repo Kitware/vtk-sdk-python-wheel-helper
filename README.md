@@ -7,15 +7,12 @@ VTK-SDK Python Helper is a collection of CMake modules to help you build VTK-com
 For common usages, simply use FetchContent
 ```cmake
 include(FetchContent)
-FetchContent_Declare(
-  vtk-sdk-python-helper
+FetchContent_Declare(vtk-sdk-python-helper
   GIT_REPOSITORY https://github.com/Kitware/vtk-sdk-python-wheel-helper.git
-  GIT_TAG        v9.6 # matches VTK version!
+  GIT_TAG        v9.6 # matches VTK version
 )
 FetchContent_MakeAvailable(vtk-sdk-python-helper)
 ```
-
-Alternatively, all scripts, and their functions are standalone, so you can fetch them using `file(DOWNLOAD)`.
 
 ## License
 

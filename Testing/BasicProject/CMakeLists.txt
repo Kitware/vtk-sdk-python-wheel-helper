@@ -7,15 +7,11 @@ project(${SKBUILD_PROJECT_NAME}
 )
 
 include(FetchContent)
-FetchContent_Declare(
-  vtk-sdk-python-helper
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..
+FetchContent_Declare(vtk-sdk-python-helper
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../.. # we know about this path
 )
 FetchContent_MakeAvailable(vtk-sdk-python-helper)
 
-set(modules 
-  Dummy::Dummy
-)
-
+set(modules Dummy::Dummy)
 vtksdk_build_modules(${SKBUILD_PROJECT_NAME} MODULES ${modules})
 vtksdk_generate_package_init(${SKBUILD_PROJECT_NAME} MODULES ${modules})
