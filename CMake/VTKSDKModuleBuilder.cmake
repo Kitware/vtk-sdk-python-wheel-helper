@@ -3,38 +3,58 @@
 
   Find, build and wrap VTK modules for VTK-SDK based wheels.
 
-  `package_name` is the name of the python package,
-  that will be used to name the folder inside site-packages.
-  
+  - `package_name` is the name of the python package, that will be used to name the folder inside site-packages.
+  - `SOURCE_DIR` defaults to CMAKE_SOURCE_DIR, it will be the root for vtk.module search paths.
+  - `ENABLE_TESTS` build testing of modules, default to OFF.
+  - `STATIC` if specified native libraries are build as static libraries, otherwise as shared (recommanded).
+  - `MODULES` list of modules to build, must be non-empty.
+
   .. code-block:: cmake
 
   vtksdk_build_modules(<package_name>
     [SOURCE_DIR <path>]
     [ENABLE_TESTS <TRUE_VALUE|FALSE_VALUE>]
+    [STATIC]
     MODULES <module>...
     )
 #]==]
 function(vtksdk_build_modules package_name)
   cmake_parse_arguments(PARSE_ARGV 0 arg
-    ""
+    "STATIC"
     "SOURCE_DIR;ENABLE_TESTS"
     "MODULES"
   )
 
-  # Search for "vtk.module" files in all subdirectories. If not defined, use top level CMakeLists
+  # Search for "vtk.module" files in all subdirectories. If not defined, use top level CMakeLists directory
   if(NOT DEFINED arg_SOURCE_DIR)
     set(arg_SOURCE_DIR ${CMAKE_SOURCE_DIR})
   endif()
 
+  # VTK uses complex values (ON, OFF, DEFAULT, WANT, DONT_WANT) for enabling tests, abstract this away
   set(_enable_tests OFF)
   if(arg_ENABLE_TESTS)
     set(_enable_tests ON)
+  endif()
+
+  set(BUILD_SHARED_LIBS ON)
+  if(arg_STATIC)
+    set(BUILD_SHARED_LIBS OFF)
+    set(CMAKE_POSITION_INDEPENDENT_CODE TRUE) # will end up in a shared object
   endif()
 
   if(NOT arg_MODULES)
     message(FATAL_ERROR "MODULES must be defined and a non-empty list of modules.")
   endif()
 
+  # Get all real libraries from our modules
+  foreach(module IN LISTS arg_MODULES)
+    if(module MATCHES "VTK::")
+      message(FATAL_ERROR "VTK:: namespace is reserved for VTK owns modules. Please use a different namespace."
+        "Note that this is only enforced for the module NAME, not for its LIBRARY_NAME that may start with `vtk`")
+    endif()
+  endforeach()
+
+  # Variables defined here are used by VTK module system
   include(GNUInstallDirs)
 
   # Find the VTK-SDK provided VTK package
@@ -46,20 +66,20 @@ function(vtksdk_build_modules package_name)
   # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12363 for more info
   find_package(VTK CONFIG)
 
-  set(BUILD_SHARED_LIBS ON) # always build shared, wouldn't make sense not to
-
   # Fixup RPATHs
   if(APPLE)
-    list(APPEND CMAKE_INSTALL_RPATH "@loader_path" "@loader_path/../vtkmodules")
-  else() # assumes Linux + GNU-based toolchain
-    list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN" "$ORIGIN/../vtkmodules")
-    # required as the VTK wheels are build with the C++98 ABI
-    list(APPEND CMAKE_CXX_FLAGS "-D_GLIBCXX_USE_CXX11_ABI=0")
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path" "@loader_path/../vtkmodules" "@loader_path/third_party.libs")
+  else() # assumes Linux + GNU-like toolchain
+    list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN" "$ORIGIN/../vtkmodules" "$ORIGIN/third_party.libs")
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+      # required as the VTK x86_64 wheels are build with the C++98 ABI
+      # https://gitlab.kitware.com/vtk/vtk/-/issues/19919
+      list(APPEND CMAKE_CXX_FLAGS "-D_GLIBCXX_USE_CXX11_ABI=0")
+    endif()
   endif ()
 
   vtk_module_find_modules(_module_files ${arg_SOURCE_DIR})
 
-  # Scan the module files.
   vtk_module_scan(
     MODULE_FILES     ${_module_files}
     REQUEST_MODULES  ${arg_MODULES}
@@ -67,7 +87,8 @@ function(vtksdk_build_modules package_name)
     ENABLE_TESTS     "${_enable_tests}"
   )
 
-  # Set up the module build.
+  # Build modules without installing headers as this is a runtime only package
+  # TODO: check that .lib are not installed on windows
   vtk_module_build(
     MODULES               ${_modules}
     ARCHIVE_DESTINATION   "${package_name}/lib"
@@ -81,7 +102,7 @@ function(vtksdk_build_modules package_name)
     SOVERSION             "1"
   )
 
-  # Perform the wrapping
+  # Wrap modules without installing headers as this is a runtime only package
   vtk_module_wrap_python(
     MODULES             ${_modules}
     PYTHON_PACKAGE      "${package_name}"

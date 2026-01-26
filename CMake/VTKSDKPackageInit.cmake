@@ -5,14 +5,20 @@
   To correctly initialize VTK in the context of VTK-SDK we have to import
   all dependent modules before importing dependent modules.
 
+  - [`INPUT`|`CONTENT`] input file to configure, optional, see below.
+  - `MODULES` list of modules to build, must be non-empty.
+    Should be the same as the one given to vtksdk_build_modules().
+
+  @PACKAGE_INIT@ will be replaced by VTK and package modules import.
+  @PACKAGE_UNINIT@ will be replace by VTK module deletions, so your module won't expose VTK.
+
   Default file, used if neither INPUT or CONTENT is specified, is:
   ```py
   @PACKAGE_INIT@
   @PACKAGE_UNINIT@
   ```
 
-  @PACKAGE_INIT@ will be replaced by VTK and package modules import.
-  @PACKAGE_UNINIT@ will be replace by VTK module deletions, so your module won't expose VTK.
+  Configured file is name __init__.py, and it automatically added to your wheel at your package root folder.
 
   .. code-block:: cmake
 
@@ -24,7 +30,7 @@
 function(vtksdk_generate_package_init package_name)
   cmake_parse_arguments(PARSE_ARGV 0 arg
     ""
-    "INPUT;CONTENT;OUTPUT"
+    "INPUT;CONTENT"
     "MODULES"
   )
 
