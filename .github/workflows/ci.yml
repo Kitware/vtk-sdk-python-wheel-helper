@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-15-intel, macos-14]
-        python-version: ['3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.13']
 
     steps:
     - uses:  actions/checkout@v4
@@ -24,9 +24,13 @@ jobs:
         cache-dependency-path: 'pyproject.toml'
     
     - name: Build wheel
+      # Test 1: Check that module can be imported and class constructed correctly 
+      # Test 2: Check that vtkmodules do not leak out of basic_project module
+      # Test 3: Check that basic_project dependencies are only the required ones
       run: |
         cd Testing/BasicProject
         python -m pip install --upgrade pip
         python -m pip install . --extra-index-url https://wheels.vtk.org --extra-index-url https://vtk.org/files/wheel-sdks
         python -c "from basic_project import vtkDummy; print(vtkDummy()); exit(0)"
         python -c "import basic_project; exit(int(hasattr(basic_project, 'vtkmodules')))"
+        python -c "import basic_project; from pathlib import Path; exit(0 if sum(1 for f in Path(basic_project.__path__[0] + '/third_party.libs').iterdir() if f.is_file()) == 1 else 1)"

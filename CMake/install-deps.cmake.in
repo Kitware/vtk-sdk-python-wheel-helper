@@ -1,0 +1,65 @@
+file(GET_RUNTIME_DEPENDENCIES
+  RESOLVED_DEPENDENCIES_VAR resolved_deps
+  UNRESOLVED_DEPENDENCIES_VAR unresolved_deps
+  LIBRARIES
+    @MODULES_LIBS@
+  DIRECTORIES
+    @SEARCH_PATHS@
+  PRE_EXCLUDE_REGEXES
+    # Windows API sets
+    "api-ms-"
+    "ext-ms-"
+    # User pre excludes
+    @arg_PRE_EXCLUDE_REGEXES@
+  POST_EXCLUDE_REGEXES
+    # VTK exclude list
+    @VTK_EXCLUDE_LIST@
+    # Windows system libraries
+    "C:(/|\\)Windows"
+    # Unix-like system provided libraries
+    "^/(lib|usr/lib|usr/local/lib)"
+    # User post excludes
+    @arg_POST_EXCLUDE_REGEXES@
+  PRE_INCLUDE_REGEXES
+    @arg_PRE_INCLUDE_REGEXES@
+  POST_INCLUDE_REGEXES
+    @arg_POST_INCLUDE_REGEXES@
+  POST_INCLUDE_FILES
+    @arg_POST_INCLUDE_FILES@
+  POST_EXCLUDE_FILES  
+    @arg_POST_EXCLUDE_FILES@
+)
+
+# We want to remove all dependencies that are part of the build tree.
+# doing so in POST_EXCLUDE_REGEXES will cut dependencies resolution too early:
+# only one level of dependencies of LIBRARIES would be resolved as they technically excluded
+list(FILTER resolved_deps EXCLUDE REGEX @SELF_EXCLUDE_LIST@)
+
+foreach(dep IN LISTS unresolved_deps)
+  message(WARNING "${dep} wasn't resolved nor excluded. It won't be installed!")
+endforeach()
+
+# Sometimes dependencies are symlinks, file(GET_RUNTIME_DEPENDENCIES) do not follow them
+# so we might end up with an orphan symlink in our third_party folder if we don't follow them manually.
+set(resolved_symlinks)
+if(@UNIX@)
+  foreach(dep IN LISTS resolved_deps)
+    # resolve until we reach the real file
+    while(IS_SYMLINK "${dep}")
+      file(READ_SYMLINK "${dep}" result)
+      if(NOT IS_ABSOLUTE "${result}")
+        cmake_path(GET dep PARENT_PATH dir)
+        set(resolved "${dir}/${result}")
+        list(APPEND resolved_symlinks "${resolved}")
+        set(dep "${resolved}")
+      endif()
+    endwhile()
+  endforeach()
+endif()
+
+file(INSTALL
+  FILES
+    ${resolved_deps}
+    ${resolved_symlinks}
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/@package_name@/third_party.libs
+)

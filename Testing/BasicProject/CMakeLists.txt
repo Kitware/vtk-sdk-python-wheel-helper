@@ -12,6 +12,16 @@ FetchContent_Declare(vtk-sdk-python-helper
 )
 FetchContent_MakeAvailable(vtk-sdk-python-helper)
 
+FetchContent_Declare(dependency
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../Dependency # we know about this path
+  EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(dependency)
+
 set(modules Dummy::Dummy)
 vtksdk_build_modules(${SKBUILD_PROJECT_NAME} MODULES ${modules})
 vtksdk_generate_package_init(${SKBUILD_PROJECT_NAME} MODULES ${modules})
+vtksdk_install_runtimes_deps(${SKBUILD_PROJECT_NAME}
+  MODULES ${modules}
+  PATHS "${dependency_BINARY_DIR}/bin"
+)

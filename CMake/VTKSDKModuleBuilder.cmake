@@ -66,15 +66,20 @@ function(vtksdk_build_modules package_name)
   # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12363 for more info
   find_package(VTK CONFIG)
 
+  # CMAKE_CXX_FLAGS seems ignored by python targets for unknown reasons
+  # Use the provided "UTILITY_TARGET" to pass options
+  add_library(wrap_utility_target INTERFACE)
+
   # Fixup RPATHs
   if(APPLE)
-    list(APPEND CMAKE_INSTALL_RPATH "@loader_path" "@loader_path/../vtkmodules" "@loader_path/third_party.libs")
-  else() # assumes Linux + GNU-like toolchain
-    list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN" "$ORIGIN/../vtkmodules" "$ORIGIN/third_party.libs")
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../vtkmodules" "@loader_path/third_party.libs" "@loader_path")
+  elseif(NOT WIN32) # assumes Linux + GNU-like toolchain
+    list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN/../vtkmodules" "$ORIGIN/third_party.libs" "$ORIGIN")
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
       # required as the VTK x86_64 wheels are build with the C++98 ABI
       # https://gitlab.kitware.com/vtk/vtk/-/issues/19919
       list(APPEND CMAKE_CXX_FLAGS "-D_GLIBCXX_USE_CXX11_ABI=0")
+      target_compile_definitions(wrap_utility_target INTERFACE "_GLIBCXX_USE_CXX11_ABI=0")
     endif()
   endif ()
 
@@ -110,6 +115,7 @@ function(vtksdk_build_modules package_name)
     BUILD_STATIC        OFF
     BUILD_PYI_FILES     ON
     INSTALL_HEADERS     OFF
+    UTILITY_TARGET      wrap_utility_target
     LIBRARY_DESTINATION "." # this generate warnings, but we can't do anything else...
     MODULE_DESTINATION  "."
   )
