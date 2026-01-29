@@ -15,7 +15,7 @@ file(GET_RUNTIME_DEPENDENCIES
     # VTK exclude list
     @VTK_EXCLUDE_LIST@
     # Windows system libraries
-    "C:(/|\\)Windows"
+    "C:(/|\\\\)Windows"
     # Unix-like system provided libraries
     "^/(lib|usr/lib|usr/local/lib)"
     # User post excludes
