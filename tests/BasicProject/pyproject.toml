@@ -2,7 +2,7 @@
 requires = [
     "scikit-build-core",
     # Version of "vtk-sdk" should always be specified using "==X.Y.Z" and match the one associated with the "vtk" dependency below.
-    "vtk-sdk==9.6.0rc3"
+    "vtk-sdk==9.6.0"
 ]
 build-backend = "scikit_build_core.build"
 
@@ -12,4 +12,4 @@ BUILD_SDK = "OFF"
 [project]
 name = "basic-project"
 version = "1.2.3"
-dependencies = ["vtk==9.6.0rc3"]
+dependencies = ["vtk==9.6.0"]

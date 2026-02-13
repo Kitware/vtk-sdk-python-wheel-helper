@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core", "basic-project-sdk==1.2.3", "vtk-sdk==9.6.0rc3"]
+requires = ["scikit-build-core", "basic-project-sdk==1.2.3", "vtk-sdk==9.6.0"]
 build-backend = "scikit_build_core.build"
 
 [project]
