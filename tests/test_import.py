@@ -9,7 +9,7 @@ def test_import(virtualenv: VEnv, wheelhouse: Path, basic_project):
     virtualenv.module("pip", "install", "basic-project",
         "--find-links", wheelhouse.as_posix(), 
         "--extra-index-url", "https://vtk.org/files/wheel-sdks",
-        "--extra-index-url", " https://wheels.vtk.org"
+        "--extra-index-url", "https://wheels.vtk.org"
     )
 
     virtualenv.execute("from basic_project import vtkDummy; print(vtkDummy()); exit(0)")
