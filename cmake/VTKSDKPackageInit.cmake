@@ -88,11 +88,19 @@ function(vtksdk_generate_package_init package_name)
 
   # On windows we have to register third_party directories using os.add_dll_directory
   if(WIN32)
-    string(APPEND PACKAGE_INIT "import os\n" "from pathlib import Path\n")
-    string(APPEND PACKAGE_INIT "os.add_dll_directory(Path(os.curdir) / \"third_party.libs\").resolve().as_posix()\n")
+    set(candidates "Path(__file__).parent / \"third_party.libs\"")
     foreach(dep IN LISTS arg_DEPENDENCIES)
-      string(APPEND PACKAGE_INIT "os.add_dll_directory(Path(os.curdir) / \"..\" / \"${dep}\" / \"third_party.libs\").resolve().as_posix()\n")
+      list(APPEND candidates "Path(__file__).parent / \"..\" / \"${dep}\" / \"third_party.libs\"")
     endforeach()
+    list(JOIN candidates "," candidates)
+
+    string(APPEND PACKAGE_INIT
+      "import os\n"
+      "from pathlib import Path\n"
+      "for p in [${candidates}]:\n"
+      "  if p.is_dir():\n"
+      "    os.add_dll_directory(str(p.resolve()))\n"
+    )
   endif()
 
   # Generate import of given dependencies

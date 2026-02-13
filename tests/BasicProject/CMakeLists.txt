@@ -37,6 +37,6 @@ else()
   vtksdk_generate_package_init(${SKBUILD_PROJECT_NAME} MODULES ${modules})
   vtksdk_install_runtimes_deps(${SKBUILD_PROJECT_NAME}
     MODULES ${modules}
-    PATHS "${dependency_BINARY_DIR}/bin"
+    PATHS "$<TARGET_FILE_DIR:Dependency::Dependency>"
   )
 endif()
