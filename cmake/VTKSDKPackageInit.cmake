@@ -86,9 +86,18 @@ function(vtksdk_generate_package_init package_name)
     set(need_del_vtkmodules TRUE)
   endforeach()
 
+  # On windows we have to register third_party directories using os.add_dll_directory
+  if(WIN32)
+    string(APPEND PACKAGE_INIT "import os\n" "from pathlib import Path\n")
+    string(APPEND PACKAGE_INIT "os.add_dll_directory(Path(os.curdir) / \"third_party.libs\").resolve().as_posix()\n")
+    foreach(dep IN LISTS arg_DEPENDENCIES)
+      string(APPEND PACKAGE_INIT "os.add_dll_directory(Path(os.curdir) / \"..\" / \"${dep}\" / \"third_party.libs\").resolve().as_posix()\n")
+    endforeach()
+  endif()
+
   # Generate import of given dependencies
-  foreach(module IN LISTS arg_DEPENDENCIES)
-    string(APPEND PACKAGE_INIT "import ${module}\n")
+  foreach(dep IN LISTS arg_DEPENDENCIES)
+    string(APPEND PACKAGE_INIT "import ${dep}\n")
   endforeach()
 
   # Generate import of given modules
@@ -105,8 +114,8 @@ function(vtksdk_generate_package_init package_name)
   if(need_del_vtkmodules)
     string(APPEND PACKAGE_UNINIT "del vtkmodules\n")
   endif()
-  foreach(module IN LISTS arg_DEPENDENCIES)
-    string(APPEND PACKAGE_UNINIT "del ${module}\n")
+  foreach(dep IN LISTS arg_DEPENDENCIES)
+    string(APPEND PACKAGE_UNINIT "del ${dep}\n")
   endforeach()
   string(APPEND PACKAGE_UNINIT "# END: Generated automatically by VTK-SDK helper\n")
 
