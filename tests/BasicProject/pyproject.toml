@@ -6,6 +6,9 @@ requires = [
 ]
 build-backend = "scikit_build_core.build"
 
+[tool.scikit-build.cmake.define]
+BUILD_SDK = "OFF"
+
 [project]
 name = "basic-project"
 version = "1.2.3"

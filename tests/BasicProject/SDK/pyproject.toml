@@ -1,0 +1,16 @@
+[build-system]
+requires = ["scikit-build-core", "vtk-sdk==9.6.0.rc3"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+cmake.source-dir = ".."
+
+[tool.scikit-build.cmake.define]
+BUILD_SDK = "ON"
+
+[project]
+name = "basic-project-sdk"
+version = "1.2.3"
+
+[project.entry-points."cmake.prefix"]
+Dummy = "basic_project_sdk.cmake"

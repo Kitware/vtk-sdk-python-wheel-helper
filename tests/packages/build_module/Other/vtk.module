@@ -1,0 +1,8 @@
+NAME
+  Other::Other
+LIBRARY_NAME
+  vtkOther
+DEPENDS
+  Dummy::Dummy
+DESCRIPTION
+  "vtkOther"

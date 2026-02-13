@@ -1,0 +1,11 @@
+[build-system]
+requires = ["scikit-build-core", "basic-project-sdk==1.2.3"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "basic-project-sdk-test"
+version = "1.0.0"
+authors = [
+  { name = "Alexy Pellegrini", email = "alexy.pellegrini@kitware.com" }
+]
+dependencies = []
