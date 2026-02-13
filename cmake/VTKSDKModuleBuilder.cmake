@@ -85,7 +85,7 @@ function(vtksdk_build_modules package_name)
   # this is a workaround for a VTK-SDK issue on Windows, caused by vtkRenderingOpenXR module.
   # This should later become the only find_package, and it should be REQUIRED!
   # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12363 for more info
-  find_package(VTK CONFIG)
+  find_package(VTK CONFIG QUIET)
 
   # CMAKE_CXX_FLAGS seems ignored by python targets for unknown reasons
   # Use the provided "UTILITY_TARGET" to pass options
