@@ -9,9 +9,11 @@ if(NOT DEFINED SKBUILD_PROJECT_NAME)
     message(FATAL_ERROR "This file must only be used when build scikit-build-core projects.")
 endif()
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Include all modules by default
+include(VTKSDKCommon)
 include(VTKSDKModuleBuilder)
+include(VTKSDKModuleSDK)
 include(VTKSDKPackageInit)
 include(VTKSDKInstallRuntimeDeps)

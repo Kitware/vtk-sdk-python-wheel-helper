@@ -24,6 +24,7 @@
 
   vtksdk_generate_package_init(<package_name>
     [INPUT <path> | CONTENT <content>]
+    [DEPENDENCIES <packages...>]
     MODULES <module>...
     )
 #]==]
@@ -31,7 +32,7 @@ function(vtksdk_generate_package_init package_name)
   cmake_parse_arguments(PARSE_ARGV 0 arg
     ""
     "INPUT;CONTENT"
-    "MODULES"
+    "DEPENDENCIES;MODULES"
   )
 
   if(NOT arg_MODULES)
@@ -67,10 +68,12 @@ function(vtksdk_generate_package_init package_name)
 
   # Generate header/footer
   set(PACKAGE_INIT "# BEGIN: Generated automatically by VTK-SDK helper\n")
+  set(need_del_vtkmodules FALSE)
 
-  # Generate import/del of vtkmodules
+  # Generate import of vtkmodules
   foreach(module IN LISTS modules_deps)
     # ignore all non-VTK modules
+    message(STATUS ${module})
     if(NOT module MATCHES "^VTK::")
       continue()
     endif()
@@ -80,6 +83,12 @@ function(vtksdk_generate_package_init package_name)
     endif()
     vtk_module_get_property(${module} PROPERTY INTERFACE_vtk_module_library_name VARIABLE _name)
     string(APPEND PACKAGE_INIT "import vtkmodules.${_name}\n")
+    set(need_del_vtkmodules TRUE)
+  endforeach()
+
+  # Generate import of given dependencies
+  foreach(module IN LISTS arg_DEPENDENCIES)
+    string(APPEND PACKAGE_INIT "import ${module}\n")
   endforeach()
 
   # Generate import of given modules
@@ -93,7 +102,12 @@ function(vtksdk_generate_package_init package_name)
 
   # Generate footer
   set(PACKAGE_UNINIT "# BEGIN: Generated automatically by VTK-SDK helper\n")
-  string(APPEND PACKAGE_UNINIT "del vtkmodules\n")
+  if(need_del_vtkmodules)
+    string(APPEND PACKAGE_UNINIT "del vtkmodules\n")
+  endif()
+  foreach(module IN LISTS arg_DEPENDENCIES)
+    string(APPEND PACKAGE_UNINIT "del ${module}\n")
+  endforeach()
   string(APPEND PACKAGE_UNINIT "# END: Generated automatically by VTK-SDK helper\n")
 
   # transform arg content into a file as configure_file can only take files

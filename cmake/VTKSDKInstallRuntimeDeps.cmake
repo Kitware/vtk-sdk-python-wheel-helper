@@ -14,7 +14,7 @@
 
   vtksdk_build_modules(<package_name>
     MODULES <module>...
-    [PATHS <paths>...] 
+    [PATHS <paths>...]
     [PRE_INCLUDE_REGEXES <regexes>...]
     [PRE_EXCLUDE_REGEXES <regexes>...]
     [POST_INCLUDE_REGEXES <regexes>...]
@@ -45,7 +45,7 @@ function(vtksdk_install_runtimes_deps package_name)
   list(JOIN MODULES_LIBS "\n" MODULES_LIBS) # replace semicolons with spaces
 
   # Exclude VTK lib directory. Uses VTK::CommonCore as the source of truth, should be fine
-  # Note that building multiple time in a row with --no-clean may result in VTK not being excluded 
+  # Note that building multiple time in a row with --no-clean may result in VTK not being excluded
   find_package(VTK CONFIG REQUIRED COMPONENTS CommonCore)
   set(VTK_EXCLUDE_LIST "\"$<TARGET_FILE_DIR:VTK::CommonCore>\"")
   # Do not install libs and symlinks that may have been resolved indirectly

@@ -7,6 +7,8 @@
   - `SOURCE_DIR` defaults to CMAKE_SOURCE_DIR, it will be the root for vtk.module search paths.
   - `ENABLE_TESTS` build testing of modules, default to OFF.
   - `STATIC` if specified native libraries are build as static libraries, otherwise as shared (recommanded).
+  - `LAYOUT` default to runtime. Use SDK when building a SDK package.
+  - `DEPENDENCIES` packages this package depends on, used to correct RPATHs.
   - `MODULES` list of modules to build, must be non-empty.
 
   .. code-block:: cmake
@@ -15,14 +17,16 @@
     [SOURCE_DIR <path>]
     [ENABLE_TESTS <TRUE_VALUE|FALSE_VALUE>]
     [STATIC]
+    [LAYOUT <Runtime|SDK>]
+    [DEPENDENCIES <packages...>]
     MODULES <module>...
     )
 #]==]
 function(vtksdk_build_modules package_name)
   cmake_parse_arguments(PARSE_ARGV 0 arg
-    "STATIC"
-    "SOURCE_DIR;ENABLE_TESTS"
-    "MODULES"
+    "INSTALL_SDK;STATIC"
+    "SOURCE_DIR;ENABLE_TESTS;LAYOUT"
+    "DEPENDENCIES;MODULES"
   )
 
   # Search for "vtk.module" files in all subdirectories. If not defined, use top level CMakeLists directory
@@ -31,9 +35,9 @@ function(vtksdk_build_modules package_name)
   endif()
 
   # VTK uses complex values (ON, OFF, DEFAULT, WANT, DONT_WANT) for enabling tests, abstract this away
-  set(_enable_tests OFF)
+  set(enable_tests OFF)
   if(arg_ENABLE_TESTS)
-    set(_enable_tests ON)
+    set(enable_tests ON)
   endif()
 
   set(BUILD_SHARED_LIBS ON)
@@ -42,17 +46,34 @@ function(vtksdk_build_modules package_name)
     set(CMAKE_POSITION_INDEPENDENT_CODE TRUE) # will end up in a shared object
   endif()
 
+  # Locations and some args differ when building the SDK instead of the runtime wheel
+  if(arg_LAYOUT STREQUAL "SDK")
+    set(base_install_dir "${package_name}/content")
+    set(lib_install_dir "${package_name}/content/lib")
+    set(python_lib_install_dir "${package_name}/content")
+    set(cmake_install_dir "${package_name}/content/cmake/${package_name}")
+    # This will make VTK CMake code to install required files to build against this install tree
+    set(sdk_args_build
+      CMAKE_DESTINATION "${cmake_install_dir}"
+      INSTALL_HEADERS   "ON"
+      INSTALL_EXPORT    "${package_name}-targets"
+    )
+    set(sdk_args_wrap
+      CMAKE_DESTINATION "${cmake_install_dir}"
+    )
+  else()
+    set(base_install_dir "${package_name}")
+    set(lib_install_dir "${package_name}")
+    set(python_lib_install_dir ".")
+    set(sdk_args_build INSTALL_HEADERS OFF)
+    set(sdk_args_wrap INSTALL_HEADERS OFF)
+  endif()
+
   if(NOT arg_MODULES)
     message(FATAL_ERROR "MODULES must be defined and a non-empty list of modules.")
   endif()
 
-  # Get all real libraries from our modules
-  foreach(module IN LISTS arg_MODULES)
-    if(module MATCHES "VTK::")
-      message(FATAL_ERROR "VTK:: namespace is reserved for VTK owns modules. Please use a different namespace."
-        "Note that this is only enforced for the module NAME, not for its LIBRARY_NAME that may start with `vtk`")
-    endif()
-  endforeach()
+  _vtksdk_check_module_names(arg_MODULES package_namespace)
 
   # Variables defined here are used by VTK module system
   include(GNUInstallDirs)
@@ -73,50 +94,70 @@ function(vtksdk_build_modules package_name)
   # Fixup RPATHs
   if(APPLE)
     list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../vtkmodules" "@loader_path/third_party.libs" "@loader_path")
+    foreach(dep IN LISTS arg_DEPENDENCIES)
+      list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../${dep}" "@loader_path/../${dep}/third_party.libs")
+    endforeach()
   elseif(NOT WIN32) # assumes Linux + GNU-like toolchain
     list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN/../vtkmodules" "$ORIGIN/third_party.libs" "$ORIGIN")
+    foreach(dep IN LISTS arg_DEPENDENCIES)
+      list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN/../${dep}" "$ORIGIN/../${dep}/third_party.libs")
+    endforeach()
+
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
       # required as the VTK x86_64 wheels are build with the C++98 ABI
       # https://gitlab.kitware.com/vtk/vtk/-/issues/19919
       target_compile_definitions(vtk_sdk_utility_target INTERFACE "_GLIBCXX_USE_CXX11_ABI=0")
     endif()
-  endif ()
+  endif()
 
-  vtk_module_find_modules(_module_files ${arg_SOURCE_DIR})
+  vtk_module_find_modules(module_files ${arg_SOURCE_DIR})
 
   vtk_module_scan(
-    MODULE_FILES     ${_module_files}
+    MODULE_FILES     ${module_files}
     REQUEST_MODULES  ${arg_MODULES}
-    PROVIDES_MODULES _modules
-    ENABLE_TESTS     "${_enable_tests}"
+    PROVIDES_MODULES modules
+    ENABLE_TESTS     "${enable_tests}"
   )
 
   # Build modules without installing headers as this is a runtime only package
-  # TODO: check that .lib are not installed on windows
+  # TODO: check that .lib are not installed on windows when building runtime package
   vtk_module_build(
-    MODULES               ${_modules}
-    ARCHIVE_DESTINATION   "${package_name}/lib"
-    INSTALL_HEADERS       OFF
-    HEADERS_DESTINATION   "${package_name}/include"
-    LICENSE_DESTINATION   "${package_name}"
-    HIERARCHY_DESTINATION "${package_name}/hierarchy"
-    RUNTIME_DESTINATION   "${package_name}"
-    LIBRARY_DESTINATION   "${package_name}"
+    MODULES               ${modules}
+    ARCHIVE_DESTINATION   "${base_install_dir}/lib"
+    INSTALL_HEADERS       "${install_headers}"
+    HEADERS_DESTINATION   "${base_install_dir}/include"
+    LICENSE_DESTINATION   "${base_install_dir}"
+    HIERARCHY_DESTINATION "${base_install_dir}/hierarchy"
+    RUNTIME_DESTINATION   "${lib_install_dir}"
+    LIBRARY_DESTINATION   "${lib_install_dir}"
     UTILITY_TARGET        vtk_sdk_utility_target
-    VERSION                ${SKBUILD_PROJECT_VERSION}
+    VERSION               ${SKBUILD_PROJECT_VERSION}
     SOVERSION             "1"
+    ${sdk_args_build}
   )
 
   # Wrap modules without installing headers as this is a runtime only package
   vtk_module_wrap_python(
-    MODULES             ${_modules}
+    MODULES             ${modules}
     PYTHON_PACKAGE      "${package_name}"
     SOABI               "${Python${VTK_PYTHON_VERSION}_SOABI}"
     BUILD_STATIC        OFF
     BUILD_PYI_FILES     ON
-    INSTALL_HEADERS     OFF
+    INSTALL_HEADERS     "${install_headers}"
     UTILITY_TARGET      vtk_sdk_utility_target
-    LIBRARY_DESTINATION "." # this generate warnings, but we can't do anything else...
-    MODULE_DESTINATION  "."
+    LIBRARY_DESTINATION "${python_lib_install_dir}" # this generate warnings, but we can't do anything else...
+    MODULE_DESTINATION  "${python_lib_install_dir}"
+    ${sdk_args_wrap}
   )
+
+  # We are forced to do this here, the vtk_module_export_find_packages only keep track
+  # of modules find packages in the current scope... Which is this function
+  if(arg_LAYOUT STREQUAL "SDK")
+    vtk_module_export_find_packages(
+        CMAKE_DESTINATION "${cmake_install_dir}"
+        FILE_NAME         "${package_name}-vtk-module-find-packages.cmake"
+        MODULES           ${modules}
+    )
+  endif()
+
 endfunction()

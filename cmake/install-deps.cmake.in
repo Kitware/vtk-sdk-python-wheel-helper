@@ -26,13 +26,23 @@ file(GET_RUNTIME_DEPENDENCIES
     @arg_POST_INCLUDE_REGEXES@
   POST_INCLUDE_FILES
     @arg_POST_INCLUDE_FILES@
-  POST_EXCLUDE_FILES  
+  POST_EXCLUDE_FILES
     @arg_POST_EXCLUDE_FILES@
 )
 
 # We want to remove all dependencies that are part of the build tree.
 # doing so in POST_EXCLUDE_REGEXES will cut dependencies resolution too early:
 # only one level of dependencies of LIBRARIES would be resolved as they technically excluded
+# We need to normalized all deps paths, in case our project has external dependencies that comes from
+# a FetchContent or a out-of-tree subdirectory, the path will be "${CMAKE_BINARY_DIR}/../../...".
+set(resolved_deps_normalized)
+foreach(dep IN LISTS resolved_deps)
+  cmake_path(SET normalized NORMALIZE "${dep}")
+  list(APPEND resolved_deps_normalized "${normalized}")
+endforeach()
+set(resolved_deps "${resolved_deps_normalized}")
+unset(resolved_deps_normalized)
+
 list(FILTER resolved_deps EXCLUDE REGEX @SELF_EXCLUDE_LIST@)
 
 foreach(dep IN LISTS unresolved_deps)

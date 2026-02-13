@@ -22,7 +22,6 @@ FetchContent_MakeAvailable(vtk-sdk-python-helper)
 ## TODO
 
 - Support PYI generation
-- Support SDK generation for user wheels, to chain the chains.
 
 ## License
 
