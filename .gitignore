@@ -1,0 +1,26 @@
+# Ignore all dotfiles...
+.*
+!.codespellignore
+!.clang-format
+!.gitattributes
+!.git-blame-ignore-revs
+!.github/
+!.pre-commit-config.yaml
+!.readthedocs.yaml
+!.ruff.toml
+
+# Ignore all back-up files...
+*~
+*.bak
+
+# except for .gitignore
+!.gitignore
+
+# Ignore pyc files ...
+*.pyc
+
+# PIP build files and folders
+wheelbuild/*
+venv/*
+*.whl
+__pycache__
