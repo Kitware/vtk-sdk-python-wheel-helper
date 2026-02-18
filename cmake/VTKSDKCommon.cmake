@@ -1,13 +1,13 @@
 
 #[==[.rst:
-.. cmake:command:: _vtksdk_check_module_names
+.. cmake:command:: (PRIVATE) _vtksdk_check_module_names
 
   Enforces correct module identifiers:
-    - Module namespace must start with a capital letter [A-Z], followed by any number of word character ([A-Za-z0-9-_]).
-    - Module must contain an unique namespace (:: only once).
-    - Module namespace must not be VTK::
-    - Module name must start with a letter [a-zA-Z], followed by any number of word character ([A-Za-z0-9-_])
-    - All modules share the same namespace
+  - Module namespace must start with a capital letter [A-Z], followed by any number of word character ([A-Za-z0-9-_]).
+  - Module must contain an unique namespace (:: only once).
+  - Module namespace must not be VTK::
+  - Module name must start with a letter [a-zA-Z], followed by any number of word character ([A-Za-z0-9-_])
+  - All modules share the same namespace
 #]==]
 function(_vtksdk_check_module_names modules_var namespace_output_var)
   # All errors are defered so user get them all at once,

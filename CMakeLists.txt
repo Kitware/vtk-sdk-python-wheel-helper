@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.21..3.31)
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     message(FATAL_ERROR "This file must never be configured as a top level project!"
@@ -11,7 +11,6 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-# Include all modules by default
 include(VTKSDKCommon)
 include(VTKSDKModuleBuilder)
 include(VTKSDKModuleSDK)

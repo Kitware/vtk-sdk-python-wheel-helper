@@ -6,11 +6,13 @@
 
   - `package_name` is the name of the python package, that will be used to name the folder inside site-packages.
   - `MODULES` list of modules to build, must be non-empty.
+  - `PATHS` list of paths to look at to resolve dependencies. Note that this may only be used on Windows.
+    It will generate warnings on other platforms as the R[UN]PATHs should be enough to resolve dependencies.
   - `PRE_INCLUDE_REGEXES`, `PRE_EXCLUDE_REGEXES`, `POST_INCLUDE_REGEXES`,
     `POST_EXCLUDE_REGEXES`, `POST_INCLUDE_FILES` and `POST_EXCLUDE_FILES`
     are forwarded to underlying `file(GET_RUNTIME_DEPENDENCIES)`
 
-  .. code-block:: cmake
+.. code-block:: cmake
 
   vtksdk_build_modules(<package_name>
     MODULES <module>...
@@ -26,7 +28,7 @@
 function(vtksdk_install_runtimes_deps package_name)
   cmake_parse_arguments(PARSE_ARGV 0 arg
     ""
-    "DESTINATION"
+    ""
     "MODULES;PATHS;PRE_INCLUDE_REGEXES;PRE_EXCLUDE_REGEXES;POST_INCLUDE_REGEXES;POST_EXCLUDE_REGEXES;POST_INCLUDE_FILES;POST_EXCLUDE_FILES"
   )
 

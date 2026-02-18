@@ -8,19 +8,22 @@
   - [`INPUT`|`CONTENT`] input file to configure, optional, see below.
   - `MODULES` list of modules to build, must be non-empty.
     Should be the same as the one given to vtksdk_build_modules().
+  - `DEPENDENCIES` packages this package depends on.
+    Should be the same as the one given to vtksdk_build_modules().
 
   @PACKAGE_INIT@ will be replaced by VTK and package modules import.
   @PACKAGE_UNINIT@ will be replace by VTK module deletions, so your module won't expose VTK.
 
-  Default file, used if neither INPUT or CONTENT is specified, is:
-  ```py
-  @PACKAGE_INIT@
-  @PACKAGE_UNINIT@
-  ```
-
   Configured file is name __init__.py, and it automatically added to your wheel at your package root folder.
 
-  .. code-block:: cmake
+  Default file, used if neither INPUT or CONTENT is specified, is:
+
+.. code-block::
+
+  @PACKAGE_INIT@
+  @PACKAGE_UNINIT@
+
+.. code-block:: cmake
 
   vtksdk_generate_package_init(<package_name>
     [INPUT <path> | CONTENT <content>]
@@ -73,7 +76,6 @@ function(vtksdk_generate_package_init package_name)
   # Generate import of vtkmodules
   foreach(module IN LISTS modules_deps)
     # ignore all non-VTK modules
-    message(STATUS ${module})
     if(NOT module MATCHES "^VTK::")
       continue()
     endif()

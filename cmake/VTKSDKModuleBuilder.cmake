@@ -4,14 +4,14 @@
   Find, build and wrap VTK modules for VTK-SDK based wheels.
 
   - `package_name` is the name of the python package, that will be used to name the folder inside site-packages.
-  - `SOURCE_DIR` defaults to CMAKE_SOURCE_DIR, it will be the root for vtk.module search paths.
-  - `ENABLE_TESTS` build testing of modules, default to OFF.
-  - `STATIC` if specified native libraries are build as static libraries, otherwise as shared (recommanded).
-  - `LAYOUT` default to runtime. Use SDK when building a SDK package.
-  - `DEPENDENCIES` packages this package depends on, used to correct RPATHs.
   - `MODULES` list of modules to build, must be non-empty.
+  - `SOURCE_DIR` is the root for vtk.module search paths, default to ${CMAKE_SOURCE_DIR}.
+  - `ENABLE_TESTS` build testing of modules, default to "OFF".
+  - `STATIC` if specified native libraries are build as static libraries, otherwise as shared (recommanded).
+  - `LAYOUT` Use SDK when building a SDK package. Default to "Runtime".
+  - `DEPENDENCIES` packages this package depends on, used to correct RPATHs.
 
-  .. code-block:: cmake
+.. code-block:: cmake
 
   vtksdk_build_modules(<package_name>
     [SOURCE_DIR <path>]
@@ -24,7 +24,7 @@
 #]==]
 function(vtksdk_build_modules package_name)
   cmake_parse_arguments(PARSE_ARGV 0 arg
-    "INSTALL_SDK;STATIC"
+    "STATIC"
     "SOURCE_DIR;ENABLE_TESTS;LAYOUT"
     "DEPENDENCIES;MODULES"
   )

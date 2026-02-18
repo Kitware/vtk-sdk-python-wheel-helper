@@ -1,6 +1,6 @@
 
 #[==[.rst:
-.. cmake:command:: _vtksdk_generate_install_root_code
+.. cmake:command:: (PRIVATE) _vtksdk_generate_install_root_code
 
   This generate a code sample inject in the real config module to determine the install tree root.
   The strategy is similar to the one used by CMakePackageConfigHelpers.
@@ -39,7 +39,7 @@ endfunction()
 #[==[.rst:
 .. cmake:command:: vtksdk_install_modules_sdk
 
-  Find, build and wrap VTK modules for VTK-SDK based wheels.
+  Generate config module, config module version, and scikit-build-core entry-point and install them.
 
   - `package_name` is the name of the python package, that will be used to name the folder inside site-packages.
   - `COMPATIBILITY` same as CMakePackageConfigHelpers, default to AnyNewerVersion
@@ -50,7 +50,7 @@ endfunction()
         before including the vtk-find-packages script and `EXTERNAL_DEPENDENCIES` find_package
   - `MODULES` list of modules to build, must be non-empty.
 
-  .. code-block:: cmake
+.. code-block:: cmake
 
   vtksdk_install_modules_sdk(<package_name>
     [COMPATIBILITY <AnyNewerVersion|SameMajorVersion|SameMinorVersion|ExactVersion>]
