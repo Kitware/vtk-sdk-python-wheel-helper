@@ -10,7 +10,5 @@ def test_find_package(virtualenv: VEnv, curdir: Path, wheelhouse: Path, basic_pr
     virtualenv.module(
         "pip", "install", test_src,
         "--find-links", wheelhouse.as_posix(),
-        "--extra-index-url", "https://vtk.org/files/wheel-sdks",
-        "--extra-index-url", "https://wheels.vtk.org",
         "--verbose"
     )

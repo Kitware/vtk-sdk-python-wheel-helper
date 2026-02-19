@@ -14,6 +14,11 @@ def curdir() -> Path:
 
 
 @pytest.fixture(scope="session")
+def top_level_dir() -> Path:
+    return Path(__file__).parent.parent.resolve()
+
+
+@pytest.fixture(scope="session")
 def buildenv(tmp_path_factory: pytest.TempPathFactory) -> VEnv:
     path = tmp_path_factory.mktemp("cmake_env")
     venv = VEnv(path)
@@ -58,30 +63,40 @@ def wheelhouse(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture(scope="session")
-def basic_project(buildenv: VEnv, curdir: Path, dependency: str, wheelhouse: Path) -> None:
+def vtksdk_helper(buildenv: VEnv, curdir: Path, top_level_dir: Path, dependency: str, wheelhouse: Path) -> None:
+    buildenv.module(
+        "pip", "wheel", top_level_dir.as_posix(),
+        "--wheel-dir", wheelhouse.as_posix(),
+    )
+
+
+@pytest.fixture(scope="session")
+def basic_project(buildenv: VEnv, curdir: Path, top_level_dir: Path, dependency: str, wheelhouse: Path) -> None:
     os.environ["Dependency_ROOT"] = dependency
     
     basic_project_src = (curdir / "BasicProject").as_posix()
     buildenv.module(
         "pip", "wheel", basic_project_src,
         "--wheel-dir", wheelhouse.as_posix(),
+        "--find-links", top_level_dir.as_posix(),
         "--extra-index-url", "https://vtk.org/files/wheel-sdks",
         "--extra-index-url", "https://wheels.vtk.org",
-        "--verbose"
+        "-Clogging.level=DEBUG"
     )
 
 
 @pytest.fixture(scope="session")
-def basic_project_sdk(buildenv: VEnv, curdir: Path, dependency: str, wheelhouse: Path) -> None:
+def basic_project_sdk(buildenv: VEnv, curdir: Path, top_level_dir: Path, dependency: str, wheelhouse: Path) -> None:
     os.environ["Dependency_ROOT"] = dependency
     
     basic_project_src = (curdir / "BasicProject" / "SDK").as_posix()
     buildenv.module(
         "pip", "wheel", basic_project_src,
         "--wheel-dir", wheelhouse.as_posix(),
+        "--find-links", top_level_dir.as_posix(),
         "--extra-index-url", "https://vtk.org/files/wheel-sdks",
         "--extra-index-url", "https://wheels.vtk.org",
-        "--verbose"
+        "-Clogging.level=DEBUG"
     )
 
 

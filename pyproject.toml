@@ -1,0 +1,74 @@
+[project]
+name = "vtk-sdk-python-wheel-helper"
+version = "1.0.0"
+description = "vtk-sdk-python-wheel-helper"
+authors = [
+    { name = "Alexy Pellegrini", email = "alexy.pellegrini@kitware.com" }
+]
+dependencies = []
+requires-python = ">=3.9"
+readme = "README.md"
+license = { text = "Apache 2.0 License" }
+keywords = [
+    "Python",
+    "VTK",
+    "CMake"
+]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+]
+[project.optional-dependencies]
+docs = [
+    "sphinx>=8,<9",
+    "sphinxcontrib-moderncmakedomain"
+]
+test = [
+    "pytest",
+    "virtualenv"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "/vtk_sdk_python_wheel_helper",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.semantic_release]
+version_toml = [
+    "pyproject.toml:project.version",
+]
+version_variables = [
+    "/vtk_sdk_python_wheel_helper/__init__.py:__version__",
+]
+
+build_command = """
+  python -m venv .venv
+  source .venv/bin/activate
+  pip install -U pip build
+  python -m build .
+"""
+
+version_source = "tag"
+
+[tool.semantic_release.changelog.default_templates]
+changelog_file = "CHANGELOG.md"
+output_format = "md"
+
+[tool.semantic_release.publish]
+dist_glob_patterns = ["dist/*"]
+upload_to_vcs_release = true
+
+[tool.semantic_release.branches.main]
+match = "main"
+
+[project.entry-points."cmake.module"]
+VTKSDKWheelPythonHelper = "vtk_sdk_python_wheel_helper.cmake"

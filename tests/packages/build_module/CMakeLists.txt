@@ -4,11 +4,7 @@ project(${SKBUILD_PROJECT_NAME} VERSION ${SKBUILD_PROJECT_VERSION})
 
 find_package(Dummy CONFIG REQUIRED)
 
-include(FetchContent)
-FetchContent_Declare(vtk-sdk-python-helper
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../..
-)
-FetchContent_MakeAvailable(vtk-sdk-python-helper)
+include(VTKSDKPythonWheelHelper)
 
 vtksdk_build_modules(${SKBUILD_PROJECT_NAME}
   MODULES Other::Other

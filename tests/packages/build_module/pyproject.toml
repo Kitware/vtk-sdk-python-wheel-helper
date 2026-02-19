@@ -1,5 +1,10 @@
 [build-system]
-requires = ["scikit-build-core", "basic-project-sdk==1.2.3", "vtk-sdk==9.6.0"]
+requires = [
+  "scikit-build-core",
+  "basic-project-sdk==1.2.3",
+  "vtk-sdk==9.6.0",
+  "vtk-sdk-python-wheel-helper"
+]
 build-backend = "scikit_build_core.build"
 
 [project]

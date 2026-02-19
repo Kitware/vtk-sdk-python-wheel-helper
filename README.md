@@ -11,16 +11,23 @@ VTK-SDK Python Helper is a collection of CMake modules to help you build VTK-com
 
 ## Usage
 
-For common usages, simply use FetchContent
-```cmake
-include(FetchContent)
-FetchContent_Declare(vtk-sdk-python-helper
-  GIT_REPOSITORY https://github.com/Kitware/vtk-sdk-python-wheel-helper.git
-  GIT_TAG        v9.6.0 # matches VTK version
-)
-FetchContent_MakeAvailable(vtk-sdk-python-helper)
+Add vtk-sdk-python-wheel-helper to your build requirements, with scikit-build-core build-system:
+```toml
+[build-system]
+requires = [
+    "scikit-build-core",
+    "vtk-sdk==X.Y.Z", # Version of "vtk-sdk" should always be specified using "==X.Y.Z" and match the one associated with the "vtk" dependency below.
+    "vtk-sdk-python-wheel-helper" # you can use the latest version, it supports VTK 9.6.0 and newer.
+]
+build-backend = "scikit_build_core.build"
 ```
 
+vtk-sdk-python-wheel-helper adds a path to CMAKE_MODULE_PATH variable, making its code found when including modules.
+```cmake
+include(VTKSDKPythonWheelHelper)
+```
+
+vtk-sdk adds a path to CMAKE_PREFIX_PATH, this enables helper to find VTK automatically.
 Then you get access to the helper's functions, for example:
 ```cmake
 vtksdk_build_modules(${SKBUILD_PROJECT_NAME} MODULES SuperProject::AmazingModule)

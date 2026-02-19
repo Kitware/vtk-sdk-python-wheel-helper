@@ -1,8 +1,8 @@
 [build-system]
 requires = [
-    "scikit-build-core",
-    # Version of "vtk-sdk" should always be specified using "==X.Y.Z" and match the one associated with the "vtk" dependency below.
-    "vtk-sdk==9.6.0"
+  "scikit-build-core",
+  "vtk-sdk==9.6.0", # Version of "vtk-sdk" should always be specified using "==X.Y.Z" and match the one associated with the "vtk" dependency below.
+  "vtk-sdk-python-wheel-helper"
 ]
 build-backend = "scikit_build_core.build"
 

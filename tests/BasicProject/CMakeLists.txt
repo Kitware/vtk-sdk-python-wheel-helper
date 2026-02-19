@@ -9,18 +9,6 @@ project(${SKBUILD_PROJECT_NAME}
   LANGUAGES CXX
 )
 
-# Fetch helper, in production code, you will fetch it from the repo, see comment below
-include(FetchContent)
-FetchContent_Declare(vtk-sdk-python-wheel-helper
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../.. # we know about this path when testing this repo
-  # GIT_URL https://github.com/Kitware/vtk-sdk-python-wheel-helper.git
-  # GIT_REVISION v9.6.0
-)
-# This will effectively fetch vtk-sdk-helper and include it using add_subdirectory
-# vtk-sdk-python-helper CMakeLists only gives access to functions.
-# It does nothing automatically, think of it as a "CMake library"!
-FetchContent_MakeAvailable(vtk-sdk-python-wheel-helper)
-
 # This project goes hard-mode and has a native third-party.
 # Native dependencies need to be packaged, see vtksdk_install_runtimes_deps below
 find_package(Dependency REQUIRED)
@@ -45,6 +33,12 @@ endif()
 # for more information about these functions please take a look at
 # vtk-sdk-python-helper's documentation!
 # ------------------------------------------------------------------------------
+
+message(STATUS "Module path : ${CMAKE_MODULE_PATH}")
+message(STATUS "Prefix path : ${CMAKE_PREFIX_PATH}")
+
+# It does nothing automatically, think of it as a "CMake library"!
+include(VTKSDKPythonWheelHelper)
 
 # This is the main command from the helper.
 # It will find VTK automatically, look for vtk.module files, then trigger modules build and wrapping.

@@ -5,9 +5,10 @@ This creates a venv and does pip install BasicProject in it, then call a few pyt
 from pathlib import Path
 from .venv import VEnv
 
-def test_import(virtualenv: VEnv, wheelhouse: Path, basic_project):
+def test_import(virtualenv: VEnv, top_level_dir: Path, wheelhouse: Path, basic_project):
     virtualenv.module("pip", "install", "basic-project",
         "--find-links", wheelhouse.as_posix(), 
+        "--find-links", top_level_dir.as_posix(), 
         "--extra-index-url", "https://vtk.org/files/wheel-sdks",
         "--extra-index-url", "https://wheels.vtk.org"
     )
