@@ -19,7 +19,7 @@ def top_level_dir() -> Path:
 
 
 @pytest.fixture(scope="session")
-def buildenv(tmp_path_factory: pytest.TempPathFactory, top_level_dir: Path) -> VEnv:
+def buildenv(tmp_path_factory: pytest.TempPathFactory) -> VEnv:
     path = tmp_path_factory.mktemp("cmake_env")
     venv = VEnv(path)
     venv.install("cmake")
@@ -72,7 +72,7 @@ def vtksdk_helper(buildenv: VEnv, top_level_dir: Path, wheelhouse: Path) -> None
 
 
 @pytest.fixture(scope="session")
-def basic_project(buildenv: VEnv, curdir: Path, vtksdk_helper, dependency: str, wheelhouse: Path) -> None:
+def basic_project(buildenv: VEnv, curdir: Path, dependency: str, wheelhouse: Path, vtksdk_helper) -> None:
     os.environ["Dependency_ROOT"] = dependency
     
     basic_project_src = (curdir / "BasicProject").as_posix()
@@ -87,7 +87,7 @@ def basic_project(buildenv: VEnv, curdir: Path, vtksdk_helper, dependency: str, 
 
 
 @pytest.fixture(scope="session")
-def basic_project_sdk(buildenv: VEnv, curdir: Path, vtksdk_helper, dependency: str, wheelhouse: Path) -> None:
+def basic_project_sdk(buildenv: VEnv, curdir: Path, dependency: str, wheelhouse: Path, vtksdk_helper) -> None:
     os.environ["Dependency_ROOT"] = dependency
     
     basic_project_src = (curdir / "BasicProject" / "SDK").as_posix()
