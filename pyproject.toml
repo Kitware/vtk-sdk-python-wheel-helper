@@ -71,4 +71,4 @@ upload_to_vcs_release = true
 match = "main"
 
 [project.entry-points."cmake.module"]
-VTKSDKWheelPythonHelper = "vtk_sdk_python_wheel_helper.cmake"
+VTKSDKWheelPythonHelper = "vtk_sdk_python_wheel_helper"

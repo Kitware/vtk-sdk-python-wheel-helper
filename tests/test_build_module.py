@@ -10,7 +10,6 @@ def test_build_module(virtualenv: VEnv, curdir: Path, top_level_dir: Path, wheel
     virtualenv.module(
         "pip", "install", test_src,
         "--find-links", wheelhouse.as_posix(),
-        "--find-links", top_level_dir.as_posix(),
         "--extra-index-url", "https://vtk.org/files/wheel-sdks",
         "--extra-index-url", "https://wheels.vtk.org",
         "--verbose"

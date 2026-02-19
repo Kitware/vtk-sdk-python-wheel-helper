@@ -19,7 +19,7 @@ def top_level_dir() -> Path:
 
 
 @pytest.fixture(scope="session")
-def buildenv(tmp_path_factory: pytest.TempPathFactory) -> VEnv:
+def buildenv(tmp_path_factory: pytest.TempPathFactory, top_level_dir: Path) -> VEnv:
     path = tmp_path_factory.mktemp("cmake_env")
     venv = VEnv(path)
     venv.install("cmake")
@@ -63,45 +63,46 @@ def wheelhouse(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture(scope="session")
-def vtksdk_helper(buildenv: VEnv, curdir: Path, top_level_dir: Path, dependency: str, wheelhouse: Path) -> None:
+def vtksdk_helper(buildenv: VEnv, top_level_dir: Path, wheelhouse: Path) -> None:
     buildenv.module(
         "pip", "wheel", top_level_dir.as_posix(),
-        "--wheel-dir", wheelhouse.as_posix(),
+        "--wheel-dir", wheelhouse.as_posix()
     )
+    assert list(wheelhouse.glob("vtk_sdk_python_wheel_helper-*.whl"))
 
 
 @pytest.fixture(scope="session")
-def basic_project(buildenv: VEnv, curdir: Path, top_level_dir: Path, dependency: str, wheelhouse: Path) -> None:
+def basic_project(buildenv: VEnv, curdir: Path, vtksdk_helper, dependency: str, wheelhouse: Path) -> None:
     os.environ["Dependency_ROOT"] = dependency
     
     basic_project_src = (curdir / "BasicProject").as_posix()
     buildenv.module(
         "pip", "wheel", basic_project_src,
         "--wheel-dir", wheelhouse.as_posix(),
-        "--find-links", top_level_dir.as_posix(),
+        "--find-links", wheelhouse.as_posix(),
         "--extra-index-url", "https://vtk.org/files/wheel-sdks",
-        "--extra-index-url", "https://wheels.vtk.org",
-        "-Clogging.level=DEBUG"
+        "--extra-index-url", "https://wheels.vtk.org"
     )
+    assert list(wheelhouse.glob("basic_project-*.whl"))
 
 
 @pytest.fixture(scope="session")
-def basic_project_sdk(buildenv: VEnv, curdir: Path, top_level_dir: Path, dependency: str, wheelhouse: Path) -> None:
+def basic_project_sdk(buildenv: VEnv, curdir: Path, vtksdk_helper, dependency: str, wheelhouse: Path) -> None:
     os.environ["Dependency_ROOT"] = dependency
     
     basic_project_src = (curdir / "BasicProject" / "SDK").as_posix()
     buildenv.module(
         "pip", "wheel", basic_project_src,
         "--wheel-dir", wheelhouse.as_posix(),
-        "--find-links", top_level_dir.as_posix(),
+        "--find-links", wheelhouse.as_posix(),
         "--extra-index-url", "https://vtk.org/files/wheel-sdks",
-        "--extra-index-url", "https://wheels.vtk.org",
-        "-Clogging.level=DEBUG"
+        "--extra-index-url", "https://wheels.vtk.org"
     )
+    assert list(wheelhouse.glob("basic_project_sdk-*.whl"))
 
 
 # tmp virtualenv for the test projects
 @pytest.fixture()
-def virtualenv(tmp_path: Path) -> VEnv:
+def virtualenv(tmp_path: Path, top_level_dir: Path) -> VEnv:
     path = tmp_path / "venv"
     return VEnv(path)
