@@ -47,7 +47,7 @@ version_toml = [
     "pyproject.toml:project.version",
 ]
 version_variables = [
-    "/vtk_sdk_python_wheel_helper/__init__.py:__version__",
+    "vtk_sdk_python_wheel_helper/__init__.py:__version__",
 ]
 
 build_command = """
