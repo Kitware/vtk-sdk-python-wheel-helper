@@ -44,7 +44,7 @@ Other usage example can be found on [SlicerCore repository](https://github.com/K
 
 ## Documentation
 
-CMake function documentation can be found in the cmake/*.cmake files.
+CMake functions documentation can be found in the CMake files and online @ https://vtk-sdk-python-wheel-helper.readthedocs.io/en/latest
 
 ## Future work
 
