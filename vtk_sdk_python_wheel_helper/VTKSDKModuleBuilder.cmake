@@ -93,7 +93,7 @@ function(vtksdk_build_modules package_name)
 
   # Fixup RPATHs
   if(APPLE)
-    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../vtkmodules" "@loader_path/third_party.libs" "@loader_path")
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../vtkmodules/.dylibs" "@loader_path/third_party.libs" "@loader_path")
     foreach(dep IN LISTS arg_DEPENDENCIES)
       list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../${dep}" "@loader_path/../${dep}/third_party.libs")
     endforeach()
