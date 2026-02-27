@@ -1,6 +1,6 @@
 [project]
 name = "vtk-sdk-python-wheel-helper"
-version = "1.0.0"
+version = "1.0.1"
 description = "vtk-sdk-python-wheel-helper"
 authors = [
     { name = "Alexy Pellegrini", email = "alexy.pellegrini@kitware.com" }
