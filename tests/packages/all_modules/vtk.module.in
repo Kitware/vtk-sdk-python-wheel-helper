@@ -1,0 +1,12 @@
+# Note: This file is actually generated and should neither be edited nor committed!
+NAME
+  Dummy::Dummy
+LIBRARY_NAME
+  vtkDummy
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+DEPENDS
+  @VTK_LIBRARIES@
+
