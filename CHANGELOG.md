@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.0.2 (2026-03-05)
+
+### Bug Fixes
+
+- Skip unwrapped VTK modules
+  ([`18d63d4`](https://github.com/Kitware/vtk-sdk-python-wheel-helper/commit/18d63d4557872a3ea043b6b1897bbc9553e10bf0))
+
+### Testing
+
+- Ensure tests uses the current source of this project
+  ([`c49076b`](https://github.com/Kitware/vtk-sdk-python-wheel-helper/commit/c49076ba7fa0b62f444c4a1801a8da79428a842a))
+
+
 ## v1.0.1 (2026-02-27)
 
 ### Bug Fixes
