@@ -79,11 +79,16 @@ function(vtksdk_generate_package_init package_name)
     if(NOT module MATCHES "^VTK::")
       continue()
     endif()
-    # Exclude this module as it is not wrapped in python
-    if(module MATCHES "VTK::WrappingPythonCore")
+    # Ignore unwrapped modules
+    vtk_module_get_property(${module} PROPERTY INTERFACE_vtk_module_exclude_wrap VARIABLE _wrap)
+    if(_wrap)
       continue()
     endif()
     vtk_module_get_property(${module} PROPERTY INTERFACE_vtk_module_library_name VARIABLE _name)
+    # Ignore modules without a library name, this probably means that it is an INTERFACE library
+    if(NOT _name)
+      continue()
+    endif()
     string(APPEND PACKAGE_INIT "import vtkmodules.${_name}\n")
     set(need_del_vtkmodules TRUE)
   endforeach()
