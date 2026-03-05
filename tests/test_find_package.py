@@ -10,5 +10,6 @@ def test_find_package(virtualenv: VEnv, curdir: Path, wheelhouse: Path, basic_pr
     virtualenv.module(
         "pip", "install", test_src,
         "--find-links", wheelhouse.as_posix(),
+        "--no-index",
         "--verbose"
     )
