@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.3 (2026-03-12)
+
+### Bug Fixes
+
+- **cmake**: Remove SOVERSION and VERSION from vtk_module_build_modules
+  ([`b745455`](https://github.com/Kitware/vtk-sdk-python-wheel-helper/commit/b745455f99f134a47acea143b6b19822a7917612))
+
+
 ## v1.0.2 (2026-03-05)
 
 ### Bug Fixes
