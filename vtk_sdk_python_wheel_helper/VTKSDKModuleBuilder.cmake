@@ -16,8 +16,8 @@
   vtksdk_build_modules(<package_name>
     [SOURCE_DIR <path>]
     [ENABLE_TESTS <TRUE_VALUE|FALSE_VALUE>]
-    [STATIC]
     [LAYOUT <Runtime|SDK>]
+    [STATIC]
     [DEPENDENCIES <packages...>]
     MODULES <module>...
     )
@@ -131,8 +131,6 @@ function(vtksdk_build_modules package_name)
     RUNTIME_DESTINATION   "${lib_install_dir}"
     LIBRARY_DESTINATION   "${lib_install_dir}"
     UTILITY_TARGET        vtk_sdk_utility_target
-    VERSION               ${SKBUILD_PROJECT_VERSION}
-    SOVERSION             "1"
     ${sdk_args_build}
   )
 

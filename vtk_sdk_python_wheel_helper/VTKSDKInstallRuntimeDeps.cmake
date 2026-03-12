@@ -12,6 +12,10 @@
     `POST_EXCLUDE_REGEXES`, `POST_INCLUDE_FILES` and `POST_EXCLUDE_FILES`
     are forwarded to underlying `file(GET_RUNTIME_DEPENDENCIES)`
 
+  Wheels are packaged as ZIP archives. This is important as ZIPs do not support symlinks.
+  If one of your target links against a symlink, the symlink will be replaced by a COPY of the so/dylib.
+  This may significantly increase the size of your packages.
+
 .. code-block:: cmake
 
   vtksdk_build_modules(<package_name>
