@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.4 (2026-03-16)
+
+### Bug Fixes
+
+- Propagate correctly external deps in vtksdk_install_modules_sdk
+  ([`56c1f88`](https://github.com/Kitware/vtk-sdk-python-wheel-helper/commit/56c1f88512c5dcfc977814beb58643c4dab127a5))
+
+
 ## v1.0.3 (2026-03-12)
 
 ### Bug Fixes
