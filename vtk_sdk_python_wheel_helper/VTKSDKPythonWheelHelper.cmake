@@ -1,3 +1,6 @@
+# This version is required for VTK-SDK to work properly on Linux due to vtklibx11 using $<COMPILE_ONLY:> generator expression
+cmake_minimum_required(VERSION 3.27)
+
 if(NOT DEFINED SKBUILD_PROJECT_NAME)
     message(FATAL_ERROR "This file must only be used when build scikit-build-core projects.")
 endif()
