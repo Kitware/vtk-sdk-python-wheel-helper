@@ -37,8 +37,8 @@ def buildenv(tmp_path_factory: pytest.TempPathFactory, top_level_dir: Path, whee
         "cmake",
         "scikit-build-core",
         "hatchling",
-        "vtk==9.6.0",
-        "vtk-sdk==9.6.0",
+        "vtk==9.6.2",
+        "vtk-sdk==9.6.2",
         top_level_dir.as_posix(),
         "--extra-index-url", "https://vtk.org/files/wheel-sdks",
         "--wheel-dir", wheelhouse.as_posix()
