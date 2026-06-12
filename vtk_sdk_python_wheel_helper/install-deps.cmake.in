@@ -1,3 +1,10 @@
+# file(GET_RUNTIME_DEPENDENCIES) returns normalized paths since CMake 4.3.
+set(windows_sep "[/|\\\\]")
+if(@CMAKE_VERSION@ VERSION_GREATER_EQUAL "4.3")
+  cmake_policy(SET CMP0207 NEW)
+  set(windows_sep "/")
+endif()
+
 file(GET_RUNTIME_DEPENDENCIES
   RESOLVED_DEPENDENCIES_VAR resolved_deps
   UNRESOLVED_DEPENDENCIES_VAR unresolved_deps
@@ -15,7 +22,7 @@ file(GET_RUNTIME_DEPENDENCIES
     # VTK exclude list
     @VTK_EXCLUDE_LIST@
     # Windows system libraries
-    "C:(/|\\\\)Windows"
+    "C:${windows_sep}[W|w][I|i][N|n][D|d][O|o][W|w][S|s]"
     # Unix-like system provided libraries
     "^/(lib|usr/lib|usr/local/lib)"
     # User post excludes
